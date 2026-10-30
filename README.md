@@ -154,6 +154,8 @@ Everything starts automatically in dev mode:
 | **WireMock** | Mocks the coffee machine with a 3 s delay, plus a random 1–3 s endpoint for races (100 ms in tests) |
 | **LGTM** | Grafana + Loki + Tempo + Prometheus — metrics via Micrometer + OTel |
 
+In Grafana (link in the Dev UI, or the "Dev Service Lgtm started" log line) open the **Concurrency Crossroads** dashboard. During the blocking flood platform threads jump by ~50; during the virtual flood they stay flat while the carrier pool stays at the CPU count. Metrics are exported every 2 s in dev.
+
 ---
 
 ## Running Tests
