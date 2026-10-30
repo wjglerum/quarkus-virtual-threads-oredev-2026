@@ -1,0 +1,16 @@
+# Standalone coffee machine for dev mode: async responses and plenty of threads,
+# so WireMock itself never becomes the bottleneck in the flood demos.
+services:
+  coffee-machine:
+    image: wiremock/wiremock:3.13.2
+    command:
+      - --async-response-enabled=true
+      - --container-threads=500
+      - --no-request-journal
+      - --disable-request-logging
+    ports:
+      - '8080'
+    volumes:
+      - ../resources/wiremock:/home/wiremock
+    labels:
+      io.quarkus.devservices.compose.config_map.port.8080: coffee-machine.port

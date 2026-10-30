@@ -13,12 +13,12 @@ Each approach uses the same business logic so the trade-offs are immediately com
 | Requirement | Version |
 |---|---|
 | JDK | 27 with preview features enabled |
-| Docker or Podman | running |
+| Docker or Podman | running, with the `docker compose` plugin |
 | Maven | bundled via `./mvnw` |
 
 > **Why `--enable-preview`?** Structured Concurrency (`StructuredTaskScope`) is a preview feature in Java 27 (7th preview, JEP 533; final in JDK 28 via JEP 543). The whole project compiles against Java 27 with preview enabled.
 
-All external dependencies (PostgreSQL, WireMock, Grafana/LGTM) are started automatically as **DevServices** when you run in dev mode — no manual setup required.
+All external dependencies (PostgreSQL, WireMock, Grafana/LGTM) are started automatically as **DevServices** when you run in dev mode — no manual setup required. In dev mode the coffee machine runs as a standalone WireMock container via Compose Dev Services (`src/main/docker/compose-dev.yml`) with async responses and 500 threads, so WireMock never caps the flood demos.
 
 ---
 
@@ -55,7 +55,7 @@ The traditional Java model. Each request runs on a platform (OS) thread from the
 | `/beverage/blocking` | Single request |
 | `/beverage/blocking/sequential` | 3 requests, one after another |
 | `/beverage/blocking/parallel` | 3 requests via `ManagedExecutor` |
-| `/beverage/blocking/flood?count=100` | 100 concurrent requests — shows saturation |
+| `/beverage/blocking/flood?count=100` | Fans out 100 tasks on the worker pool (capped at 50 threads + 25 queued in dev) — shows saturation |
 | `/beverage/blocking/failfast` | 3 parallel flakey calls — first failure returns 503, siblings keep running |
 
 ---
@@ -75,7 +75,7 @@ The reactive model. Requests run on the Vert.x event loop; the thread is **never
 | `/beverage/reactive` | Single request |
 | `/beverage/reactive/sequential` | 3 chained `Uni` calls |
 | `/beverage/reactive/parallel` | 3 parallel `Uni` calls via `Uni.join()` |
-| `/beverage/reactive/flood?count=100` | 100 concurrent requests |
+| `/beverage/reactive/flood?count=100` | Fans out 100 non-blocking calls |
 | `/beverage/reactive/failfast` | 3 parallel flakey calls via `Uni.join().andFailFast()` — first failure cancels the join |
 
 ---
@@ -96,7 +96,8 @@ Virtual threads (JEP 444). Each request runs on a **virtual thread** — cheap, 
 | `/beverage/virtual/sequential` | 3 sequential calls |
 | `/beverage/virtual/parallel` | 3 parallel calls via injected `@VirtualThreads` executor |
 | `/beverage/virtual/custom` | 3 parallel calls with a named custom thread factory |
-| `/beverage/virtual/flood?count=100` | 100 concurrent requests — all succeed |
+| `/beverage/virtual/flood?count=100` | Fans out 100 tasks on virtual threads — all succeed |
+| `/beverage/virtual/race` | 3 bartenders raced with `CompletableFuture.anyOf` — the losers keep brewing |
 | `/beverage/virtual/failfast` | 3 parallel flakey calls — first failure returns 503, siblings keep running |
 
 ---
@@ -105,7 +106,7 @@ Virtual threads (JEP 444). Each request runs on a **virtual thread** — cheap, 
 
 > `GET /beverage/structured`
 
-Structured Concurrency (JEP 464, preview). Subtasks are **scoped to a parent task** — when the scope closes, all subtasks are guaranteed to be done or cancelled. Enables race, fail-fast, and timeout patterns without manual thread management.
+Structured Concurrency (JEP 533, 7th preview in JDK 27; final in JDK 28). Subtasks are **scoped to a parent task** — when the scope closes, all subtasks are guaranteed to be done or cancelled. Enables race, fail-fast, and timeout patterns without manual thread management.
 
 - Lifetimes are explicit and safe: no orphaned threads
 - Cancellation propagates automatically to sibling tasks
@@ -116,8 +117,9 @@ Structured Concurrency (JEP 464, preview). Subtasks are **scoped to a parent tas
 | `/beverage/structured/simple` | default | 3 parallel tasks, collect all |
 | `/beverage/structured/custom` | `allSuccessfulOrThrow()` | Same with a named thread factory |
 | `/beverage/structured/race` | `anySuccessfulOrThrow()` | First bartender to finish wins, siblings cancelled |
+| `/beverage/structured/race/custom` | custom `FirstSuccessJoiner` | Same race with a hand-written Joiner and random 1–3 s brews — compare with `/beverage/virtual/race` |
 | `/beverage/structured/failfast` | `allSuccessfulOrThrow()` | One failure cancels everyone (uses a flakey bartender, 50% chance) |
-| `/beverage/structured/timeout` | `allSuccessfulOrThrow()` + `withTimeout` | Scope cancelled after 150 ms |
+| `/beverage/structured/timeout` | `allSuccessfulOrThrow()` + `withTimeout` | Scope cancelled after 150 ms, returns 504 |
 
 ---
 
@@ -149,7 +151,7 @@ Everything starts automatically in dev mode:
 | Service | What it does |
 |---|---|
 | **PostgreSQL** | Database for all five approaches |
-| **WireMock** | Mocks the coffee machine HTTP endpoint with a 3 s delay (100 ms in tests) |
+| **WireMock** | Mocks the coffee machine with a 3 s delay, plus a random 1–3 s endpoint for races (100 ms in tests) |
 | **LGTM** | Grafana + Loki + Tempo + Prometheus — metrics via Micrometer + OTel |
 
 ---
