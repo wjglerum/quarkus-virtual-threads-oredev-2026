@@ -43,6 +43,9 @@ GET http://localhost:8080/beverage/virtual/custom
 ### GET Virtual Flood
 GET http://localhost:8080/beverage/virtual/flood?count=100
 
+### GET Virtual Race (CompletableFuture)
+GET http://localhost:8080/beverage/virtual/race
+
 ### GET Virtual Failfast
 GET http://localhost:8080/beverage/virtual/failfast
 
@@ -54,6 +57,9 @@ GET http://localhost:8080/beverage/structured/custom
 
 ### GET Structured Race
 GET http://localhost:8080/beverage/structured/race
+
+### GET Structured Race Custom Joiner
+GET http://localhost:8080/beverage/structured/race/custom
 
 ### GET Structured Failfast
 GET http://localhost:8080/beverage/structured/failfast

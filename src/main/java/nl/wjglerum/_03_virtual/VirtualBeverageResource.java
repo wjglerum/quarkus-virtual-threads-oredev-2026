@@ -12,6 +12,7 @@ import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.Response;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -126,6 +127,16 @@ public class VirtualBeverageResource {
         } catch (ExecutionException | InterruptedException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @GET
+    @Path("/race")
+    public VirtualBeverage getBeverageRace() throws InterruptedException, ExecutionException {
+        Log.info("Going to race 3 bartenders with CompletableFuture — losers keep brewing");
+        var b1 = CompletableFuture.supplyAsync(bartender::race, executor);
+        var b2 = CompletableFuture.supplyAsync(bartender::race, executor);
+        var b3 = CompletableFuture.supplyAsync(bartender::race, executor);
+        return (VirtualBeverage) CompletableFuture.anyOf(b1, b2, b3).get();
     }
 
     @GET

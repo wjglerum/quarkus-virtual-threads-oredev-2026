@@ -87,6 +87,18 @@ public class StructuredBeverageResource {
     }
 
     @GET
+    @Path("/race/custom")
+    public StructuredBeverage getBeverageRaceCustom() throws InterruptedException, ExecutionException {
+        Log.info("Going to race 3 bartenders with a custom Joiner — losers are cancelled");
+        try (var scope = StructuredTaskScope.open(new FirstSuccessJoiner<StructuredBeverage>())) {
+            scope.fork(bartender::race);
+            scope.fork(bartender::race);
+            scope.fork(bartender::race);
+            return scope.join();
+        }
+    }
+
+    @GET
     @Path("/failfast")
     public Response getBeveragesFailFast() throws InterruptedException {
         Log.info("Going to get beverages fail-fast — one failure cancels siblings");

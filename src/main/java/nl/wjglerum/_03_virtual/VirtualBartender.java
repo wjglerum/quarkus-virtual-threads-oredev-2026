@@ -18,4 +18,11 @@ public class VirtualBartender {
         var response = coffeeMachine.brew();
         return new VirtualBeverage("Virtual " + response.name());
     }
+
+    public VirtualBeverage race() {
+        Log.info("Racing to brew a virtual coffee");
+        var response = coffeeMachine.brewRandom();
+        Log.info("Served a virtual coffee");
+        return new VirtualBeverage("Virtual " + response.name());
+    }
 }

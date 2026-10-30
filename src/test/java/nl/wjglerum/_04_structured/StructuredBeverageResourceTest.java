@@ -57,6 +57,17 @@ class StructuredBeverageResourceTest {
     }
 
     @Test
+    void testStructuredRaceCustomEndpoint() {
+        given()
+                .when()
+                .get("/race/custom")
+                .then()
+                .statusCode(200)
+                .contentType(JSON)
+                .body("name", equalTo("Structured Coffee"));
+    }
+
+    @Test
     void testStructuredFailFastEndpoint() {
         // Flakey bartender: 50% chance each, so success or 503 are both valid outcomes
         var status = given()

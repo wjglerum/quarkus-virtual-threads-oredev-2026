@@ -16,4 +16,8 @@ public interface CoffeeMachineClient {
     @GET
     @Path("/brew")
     Uni<CoffeeMachineResponse> brewAsync();
+
+    @GET
+    @Path("/brew/random")
+    CoffeeMachineResponse brewRandom();
 }

@@ -25,6 +25,17 @@ import static org.hamcrest.Matchers.in;
 class VirtualBeverageResourceTest {
 
     @Test
+    void testVirtualRaceEndpoint() {
+        given()
+                .when()
+                .get("/race")
+                .then()
+                .statusCode(200)
+                .contentType(ContentType.JSON)
+                .body(containsString("Virtual Coffee"));
+    }
+
+    @Test
     @ShouldNotPin(atMost = 1)
     void testVirtualSimpleEndpoint() {
         given()
