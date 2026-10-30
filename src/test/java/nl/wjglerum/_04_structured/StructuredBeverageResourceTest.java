@@ -78,6 +78,6 @@ class StructuredBeverageResourceTest {
                 .then()
                 .extract()
                 .statusCode();
-        assertThat(status, in(List.of(200, 408)));
+        assertThat(status, in(List.of(200, 504)));
     }
 }

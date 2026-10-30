@@ -9,7 +9,7 @@
 
     <properties>
         <compiler-plugin.version>3.16.0</compiler-plugin.version>
-        <maven.compiler.release>26</maven.compiler.release>
+        <maven.compiler.release>27</maven.compiler.release>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <quarkus.platform.artifact-id>quarkus-bom</quarkus.platform.artifact-id>
@@ -123,7 +123,7 @@
                 <version>${quarkus.platform.version}</version>
                 <extensions>true</extensions>
                 <configuration>
-                    <jvmArgs>-Djdk.tracePinnedThreads=short --enable-native-access=ALL-UNNAMED</jvmArgs>
+                    <jvmArgs>--enable-native-access=ALL-UNNAMED</jvmArgs>
                 </configuration>
             </plugin>
             <plugin>

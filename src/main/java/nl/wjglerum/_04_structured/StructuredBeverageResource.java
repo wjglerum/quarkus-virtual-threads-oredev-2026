@@ -11,12 +11,12 @@ import nl.wjglerum.ErrorResult;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.StructuredTaskScope;
-import java.util.concurrent.StructuredTaskScope.FailedException;
+import java.util.concurrent.StructuredTaskScope.CancelledByTimeoutException;
 import java.util.concurrent.StructuredTaskScope.Joiner;
-import java.util.concurrent.StructuredTaskScope.TimeoutException;
 
-import static jakarta.ws.rs.core.Response.Status.REQUEST_TIMEOUT;
+import static jakarta.ws.rs.core.Response.Status.GATEWAY_TIMEOUT;
 import static jakarta.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @Path("/beverage/structured")
@@ -36,7 +36,7 @@ public class StructuredBeverageResource {
     @GET
     @Path("/simple")
     @Transactional
-    public List<StructuredBeverage> getBeveragesSimple() throws InterruptedException {
+    public List<StructuredBeverage> getBeveragesSimple() throws InterruptedException, ExecutionException {
         Log.info("Going to get structured beverages simple");
         try (var scope = StructuredTaskScope.open()) {
             var b1 = scope.fork(bartender::get);
@@ -52,7 +52,7 @@ public class StructuredBeverageResource {
     @GET
     @Path("/custom")
     @Transactional
-    public List<StructuredBeverage> getBeveragesCustom() throws InterruptedException {
+    public List<StructuredBeverage> getBeveragesCustom() throws InterruptedException, ExecutionException {
         Log.info("Going to get structured beverages custom");
         var name = Thread.currentThread().getName();
         var threadFactory = Thread.ofVirtual().name(name + "-structured-", 0).factory();
@@ -72,7 +72,7 @@ public class StructuredBeverageResource {
     @GET
     @Path("/race")
     @Transactional
-    public StructuredBeverage getBeverageRace() throws InterruptedException {
+    public StructuredBeverage getBeverageRace() throws InterruptedException, ExecutionException {
         Log.info("Going to race 3 bartenders — first one wins, siblings cancelled");
         try (var scope = StructuredTaskScope.open(
                 Joiner.<StructuredBeverage>anySuccessfulOrThrow()
@@ -98,7 +98,7 @@ public class StructuredBeverageResource {
             scope.fork(flakeyBartender::get);
             var beverages = scope.join();
             return Response.ok(beverages).build();
-        } catch (FailedException e) {
+        } catch (ExecutionException e) {
             return error(SERVICE_UNAVAILABLE, e.getCause().getMessage());
         }
     }
@@ -116,10 +116,11 @@ public class StructuredBeverageResource {
             scope.fork(bartender::get);
             var beverages = scope.join();
             return Response.ok(beverages).build();
-        } catch (TimeoutException e) {
-            return error(REQUEST_TIMEOUT, "scope timed out — all subtasks cancelled");
-        } catch (FailedException e) {
-            return error(SERVICE_UNAVAILABLE, e.getCause().getMessage());
+        } catch (ExecutionException e) {
+            return switch (e.getCause()) {
+                case CancelledByTimeoutException _ -> error(GATEWAY_TIMEOUT, "scope timed out — all subtasks cancelled");
+                case Throwable cause -> error(SERVICE_UNAVAILABLE, cause.getMessage());
+            };
         }
     }
 

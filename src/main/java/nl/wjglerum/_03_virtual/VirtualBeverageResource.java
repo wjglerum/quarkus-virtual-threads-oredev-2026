@@ -24,7 +24,6 @@ import nl.wjglerum.FloodResult;
 import static jakarta.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @Path("/beverage/virtual")
-@Transactional
 @RunOnVirtualThread
 public class VirtualBeverageResource {
 
@@ -42,6 +41,7 @@ public class VirtualBeverageResource {
     ExecutorService executor;
 
     @GET
+    @Transactional
     public VirtualBeverage getBeverage() {
         Log.info("Going to get virtual beverage");
         var beverage = bartender.get();
@@ -51,11 +51,12 @@ public class VirtualBeverageResource {
 
     @GET
     @Path("/sequential")
+    @Transactional
     public List<VirtualBeverage> getBeveragesSequential() {
         Log.info("Going to get virtual beverages sequential");
         var beverage1 = bartender.get();
-        var beverage2 =  bartender.get();
-        var beverage3 =  bartender.get();
+        var beverage2 = bartender.get();
+        var beverage3 = bartender.get();
         var beverages = List.of(beverage1, beverage2, beverage3);
         repository.save(beverages);
         return beverages;
@@ -63,6 +64,7 @@ public class VirtualBeverageResource {
 
     @GET
     @Path("/parallel")
+    @Transactional
     public List<VirtualBeverage> getBeveragesParallel() {
         Log.info("Going to get virtual beverages parallel");
         try {
@@ -95,13 +97,21 @@ public class VirtualBeverageResource {
                 }))
                 .toList();
         for (var f : futures) {
-            try { f.get(); } catch (ExecutionException | InterruptedException ignored) {}
+            try {
+                f.get();
+            } catch (ExecutionException ignored) {
+                // failures are already counted inside the task
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
         }
         return new FloodResult(count, succeeded.get(), failed.get(), System.currentTimeMillis() - start);
     }
 
     @GET
     @Path("/custom")
+    @Transactional
     public List<VirtualBeverage> getBeveragesCustom() {
         Log.info("Going to get virtual beverages custom");
         var name = Thread.currentThread().getName();

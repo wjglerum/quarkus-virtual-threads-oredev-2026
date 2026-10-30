@@ -23,7 +23,6 @@ import nl.wjglerum.FloodResult;
 import static jakarta.ws.rs.core.Response.Status.SERVICE_UNAVAILABLE;
 
 @Path("/beverage/blocking")
-@Transactional
 public class BlockingBeverageResource {
 
     @Inject
@@ -39,6 +38,7 @@ public class BlockingBeverageResource {
     ManagedExecutor executor;
 
     @GET
+    @Transactional
     public BlockingBeverage getBeverage() {
         Log.info("Going to get blocking beverage");
         var beverage = bartender.get();
@@ -48,6 +48,7 @@ public class BlockingBeverageResource {
 
     @GET
     @Path("/sequential")
+    @Transactional
     public List<BlockingBeverage> getBeveragesSequential() {
         Log.info("Going to get blocking beverages sequential");
         var b1 = bartender.get();
@@ -60,6 +61,7 @@ public class BlockingBeverageResource {
 
     @GET
     @Path("/parallel")
+    @Transactional
     public List<BlockingBeverage> getBeveragesParallel() {
         Log.info("Going to get blocking beverages parallel");
         try {
@@ -97,7 +99,14 @@ public class BlockingBeverageResource {
             }
         }
         for (var f : futures) {
-            try { f.get(); } catch (ExecutionException | InterruptedException ignored) {}
+            try {
+                f.get();
+            } catch (ExecutionException ignored) {
+                // failures are already counted inside the task
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+                break;
+            }
         }
         return new FloodResult(count, succeeded.get(), failed.get(), System.currentTimeMillis() - start);
     }
