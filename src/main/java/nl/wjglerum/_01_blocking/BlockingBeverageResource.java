@@ -1,6 +1,7 @@
 package nl.wjglerum._01_blocking;
 
 import io.quarkus.logging.Log;
+import jakarta.annotation.PreDestroy;
 import jakarta.inject.Inject;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.DefaultValue;
@@ -12,9 +13,13 @@ import org.eclipse.microprofile.context.ManagedExecutor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import nl.wjglerum.ErrorResult;
@@ -36,6 +41,15 @@ public class BlockingBeverageResource {
 
     @Inject
     ManagedExecutor executor;
+
+    // A classic fixed-size pool for the flood demo: 50 threads, 25 queued, the rest rejected
+    private final ExecutorService floodPool =
+            new ThreadPoolExecutor(50, 50, 0, TimeUnit.MILLISECONDS, new ArrayBlockingQueue<>(25));
+
+    @PreDestroy
+    void shutdownFloodPool() {
+        floodPool.shutdownNow();
+    }
 
     @GET
     @Transactional
@@ -86,7 +100,7 @@ public class BlockingBeverageResource {
         var futures = new ArrayList<Future<?>>(count);
         for (int i = 0; i < count; i++) {
             try {
-                futures.add(executor.submit(() -> {
+                futures.add(floodPool.submit(() -> {
                     try {
                         bartender.get();
                         succeeded.incrementAndGet();

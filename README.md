@@ -55,7 +55,7 @@ The traditional Java model. Each request runs on a platform (OS) thread from the
 | `/beverage/blocking` | Single request |
 | `/beverage/blocking/sequential` | 3 requests, one after another |
 | `/beverage/blocking/parallel` | 3 requests via `ManagedExecutor` |
-| `/beverage/blocking/flood?count=100` | Fans out 100 tasks on the worker pool (capped at 50 threads + 25 queued in dev) — shows saturation |
+| `/beverage/blocking/flood?count=100` | Fans out 100 tasks on a fixed pool of 50 threads + 25 queued — shows saturation |
 | `/beverage/blocking/failfast` | 3 parallel flakey calls — first failure returns 503, siblings keep running |
 
 ---
