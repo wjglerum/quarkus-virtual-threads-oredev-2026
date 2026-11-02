@@ -74,28 +74,37 @@ public class StructuredBeverageResource {
     @Transactional
     public StructuredBeverage getBeverageRace() throws InterruptedException, ExecutionException {
         Log.info("Going to race 3 bartenders — first one wins, siblings cancelled");
+        StructuredBeverage winner;
         try (var scope = StructuredTaskScope.open(
-                Joiner.<StructuredBeverage>anySuccessfulOrThrow()
+                Joiner.<StructuredBeverage>anySuccessfulOrThrow(),
+                cf -> cf.withThreadFactory(Cancellation.bartenders())
         )) {
             scope.fork(bartender::race);
             scope.fork(bartender::race);
             scope.fork(bartender::race);
-            var winner = scope.join();
-            repository.save(winner);
-            return winner;
+            winner = scope.join();
         }
+        Log.info("Scope closed: winner served, the other bartenders were cancelled");
+        repository.save(winner);
+        return winner;
     }
 
     @GET
     @Path("/race/custom")
     public StructuredBeverage getBeverageRaceCustom() throws InterruptedException, ExecutionException {
         Log.info("Going to race 3 bartenders with a custom Joiner — losers are cancelled");
-        try (var scope = StructuredTaskScope.open(new FirstSuccessJoiner<StructuredBeverage>())) {
+        StructuredBeverage winner;
+        try (var scope = StructuredTaskScope.open(
+                new FirstSuccessJoiner<StructuredBeverage>(),
+                cf -> cf.withThreadFactory(Cancellation.bartenders())
+        )) {
             scope.fork(bartender::race);
             scope.fork(bartender::race);
             scope.fork(bartender::race);
-            return scope.join();
+            winner = scope.join();
         }
+        Log.info("Scope closed: winner served, the other bartenders were cancelled");
+        return winner;
     }
 
     @GET
@@ -103,7 +112,8 @@ public class StructuredBeverageResource {
     public Response getBeveragesFailFast() throws InterruptedException {
         Log.info("Going to get beverages fail-fast — one failure cancels siblings");
         try (var scope = StructuredTaskScope.open(
-                Joiner.<StructuredBeverage>allSuccessfulOrThrow()
+                Joiner.<StructuredBeverage>allSuccessfulOrThrow(),
+                cf -> cf.withThreadFactory(Cancellation.bartenders())
         )) {
             scope.fork(flakeyBartender::get);
             scope.fork(flakeyBartender::get);
@@ -111,6 +121,7 @@ public class StructuredBeverageResource {
             var beverages = scope.join();
             return Response.ok(beverages).build();
         } catch (ExecutionException e) {
+            Log.info("Scope closed: one bartender failed, the others were cancelled");
             return error(SERVICE_UNAVAILABLE, e.getCause().getMessage());
         }
     }
@@ -121,7 +132,7 @@ public class StructuredBeverageResource {
         Log.info("Going to get beverages with scope-level timeout");
         try (var scope = StructuredTaskScope.open(
                 Joiner.<StructuredBeverage>allSuccessfulOrThrow(),
-                cf -> cf.withTimeout(Duration.ofMillis(150))
+                cf -> cf.withTimeout(Duration.ofMillis(150)).withThreadFactory(Cancellation.bartenders())
         )) {
             scope.fork(bartender::get);
             scope.fork(bartender::get);

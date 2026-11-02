@@ -15,12 +15,23 @@ public class FlakeyBartender {
     @RestClient
     CoffeeMachineClient coffeeMachine;
 
+    // Random 1-3 s brews, so a failing bartender can cancel the ones that are still brewing
     public StructuredBeverage get() {
         Log.info("Warming up the flakey coffee machine (50% chance of failure)");
-        var response = coffeeMachine.brew();
-        if (ThreadLocalRandom.current().nextBoolean()) {
-            throw new RuntimeException("Coffee machine broke!");
+        var start = System.currentTimeMillis();
+        try {
+            var response = coffeeMachine.brewRandom();
+            if (ThreadLocalRandom.current().nextBoolean()) {
+                Log.infof("Coffee machine broke after %d ms!", System.currentTimeMillis() - start);
+                throw new RuntimeException("Coffee machine broke!");
+            }
+            Log.infof("Served a flakey coffee after %d ms", System.currentTimeMillis() - start);
+            return new StructuredBeverage("Flakey " + response.name());
+        } catch (RuntimeException e) {
+            if (Cancellation.isCancellation(e)) {
+                Log.infof("Cancelled after %d ms, stopped brewing", System.currentTimeMillis() - start);
+            }
+            throw e;
         }
-        return new StructuredBeverage("Flakey " + response.name());
     }
 }

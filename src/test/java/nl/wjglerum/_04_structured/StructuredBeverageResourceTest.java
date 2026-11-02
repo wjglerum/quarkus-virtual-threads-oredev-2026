@@ -7,12 +7,17 @@ import io.quarkus.test.junit.virtual.VirtualThreadUnit;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.logging.Handler;
+import java.util.logging.LogRecord;
+import java.util.logging.Logger;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
 import static org.hamcrest.Matchers.in;
 
 @QuarkusTest
@@ -65,6 +70,36 @@ class StructuredBeverageResourceTest {
                 .statusCode(200)
                 .contentType(JSON)
                 .body("name", equalTo("Structured Coffee"));
+    }
+
+    @Test
+    void testStructuredRaceCancelsTheLosers() {
+        var logger = Logger.getLogger(StructuredBartender.class.getName());
+        var messages = new ConcurrentLinkedQueue<String>();
+        var handler = new Handler() {
+            @Override
+            public void publish(LogRecord record) {
+                messages.add(record.getMessage());
+            }
+
+            @Override
+            public void flush() {
+            }
+
+            @Override
+            public void close() {
+            }
+        };
+        logger.addHandler(handler);
+        try {
+            for (int i = 0; i < 5; i++) {
+                given().when().get("/race/custom").then().statusCode(200);
+            }
+        } finally {
+            logger.removeHandler(handler);
+        }
+        // Each race has one winner; the scope interrupts the two bartenders still brewing
+        assertThat(messages.stream().filter(m -> m.startsWith("Cancelled")).count(), greaterThan(0L));
     }
 
     @Test

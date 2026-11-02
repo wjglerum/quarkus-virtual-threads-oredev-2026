@@ -21,8 +21,9 @@ public class VirtualBartender {
 
     public VirtualBeverage race() {
         Log.info("Racing to brew a virtual coffee");
+        var start = System.currentTimeMillis();
         var response = coffeeMachine.brewRandom();
-        Log.info("Served a virtual coffee");
+        Log.infof("Served a virtual coffee after %d ms", System.currentTimeMillis() - start);
         return new VirtualBeverage("Virtual " + response.name());
     }
 }
