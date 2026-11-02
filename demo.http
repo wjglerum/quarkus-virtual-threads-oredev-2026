@@ -1,0 +1,26 @@
+# On-stage demo script, in talk order. Full list of endpoints: examples.http
+# Keep Grafana open on the "Concurrency Crossroads" dashboard during the floods.
+
+### 1. Blocking: one coffee (~3 s)
+GET http://localhost:8080/beverage/blocking
+
+### 2. Blocking flood: 50 threads + 25 queued, so ~75 succeed, ~25 rejected, ~6 s
+GET http://localhost:8080/beverage/blocking/flood?count=100
+
+### 3. Reactive sequential: show the nested flatMap chain (~9 s)
+GET http://localhost:8080/beverage/reactive/sequential
+
+### 4. Reactive flood: all 100 succeed in ~3 s on a handful of event-loop threads
+GET http://localhost:8080/beverage/reactive/flood?count=100
+
+### 5. Virtual flood: same imperative code as blocking, all 100 succeed in ~3 s
+GET http://localhost:8080/beverage/virtual/flood?count=100
+
+### 6. Virtual race (CompletableFuture.anyOf): winner returns, losers keep brewing (watch the log)
+GET http://localhost:8080/beverage/virtual/race
+
+### 7. Structured race (custom Joiner): winner returns, losers are cancelled
+GET http://localhost:8080/beverage/structured/race/custom
+
+### 8. Structured fail-fast: one failure cancels the siblings (50% flakey, run it a few times)
+GET http://localhost:8080/beverage/structured/failfast

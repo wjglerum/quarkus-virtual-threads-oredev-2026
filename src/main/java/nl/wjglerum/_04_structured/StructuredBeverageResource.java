@@ -77,9 +77,9 @@ public class StructuredBeverageResource {
         try (var scope = StructuredTaskScope.open(
                 Joiner.<StructuredBeverage>anySuccessfulOrThrow()
         )) {
-            scope.fork(bartender::get);
-            scope.fork(bartender::get);
-            scope.fork(bartender::get);
+            scope.fork(bartender::race);
+            scope.fork(bartender::race);
+            scope.fork(bartender::race);
             var winner = scope.join();
             repository.save(winner);
             return winner;

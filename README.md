@@ -32,7 +32,7 @@ All external dependencies (PostgreSQL, WireMock, Grafana/LGTM) are started autom
 - Dev UI: <http://localhost:8080/q/dev/>
 - Grafana (LGTM): check the Dev UI for the port
 
-Use `examples.http` with your IDE HTTP client (IntelliJ, VS Code REST Client) to fire requests.
+Use `examples.http` with your IDE HTTP client (IntelliJ, VS Code REST Client) to fire requests. `demo.http` holds only the requests used on stage, in talk order.
 
 ---
 
@@ -116,8 +116,8 @@ Structured Concurrency (JEP 533, 7th preview in JDK 27; final in JDK 28). Subtas
 |---|---|---|
 | `/beverage/structured/simple` | default | 3 parallel tasks, collect all |
 | `/beverage/structured/custom` | `allSuccessfulOrThrow()` | Same with a named thread factory |
-| `/beverage/structured/race` | `anySuccessfulOrThrow()` | First bartender to finish wins, siblings cancelled |
-| `/beverage/structured/race/custom` | custom `FirstSuccessJoiner` | Same race with a hand-written Joiner and random 1–3 s brews — compare with `/beverage/virtual/race` |
+| `/beverage/structured/race` | `anySuccessfulOrThrow()` | 3 bartenders with random 1–3 s brews: first to finish wins, siblings cancelled |
+| `/beverage/structured/race/custom` | custom `FirstSuccessJoiner` | Same race with a hand-written Joiner — compare with `/beverage/virtual/race` |
 | `/beverage/structured/failfast` | `allSuccessfulOrThrow()` | One failure cancels everyone (uses a flakey bartender, 50% chance) |
 | `/beverage/structured/timeout` | `allSuccessfulOrThrow()` + `withTimeout` | Scope cancelled after 150 ms, returns 504 |
 
@@ -133,7 +133,8 @@ Structured Concurrency (JEP 533, 7th preview in JDK 27; final in JDK 28). Subtas
 
 - `PinningBartender` uses `synchronized` — the old culprit, now safe
 - `UnpinningBartender` uses `ReentrantLock` — the old workaround, still valid
-- Run with `-Djdk.tracePinnedThreads=short` (already configured) to observe zero pinning events
+- To observe pinning on JDK 24+, record the `jdk.VirtualThreadPinned` JFR event (`-Djdk.tracePinnedThreads` was removed in JDK 24); the Grafana dashboard's *Max pinned* panel shows it too
+- Both bartenders are singletons holding a lock around the brew, so the `/parallel` variants run **one after another** (~9 s in dev). That is lock contention, not pinning — which is why this section is reference material and not part of the live demo
 
 | Endpoint | Description |
 |---|---|
