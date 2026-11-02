@@ -16,11 +16,11 @@ GET http://localhost:8080/beverage/reactive/flood?count=100
 ### 5. Virtual flood: same imperative code as blocking, all 100 succeed in ~3 s
 GET http://localhost:8080/beverage/virtual/flood?count=100
 
-### 6. Virtual race (CompletableFuture.anyOf): winner returns, losers keep brewing (watch the log)
+### 6. Virtual race (CompletableFuture.anyOf): the log shows "Winner served, returning" and then the losers still "Served ... after N ms"
 GET http://localhost:8080/beverage/virtual/race
 
-### 7. Structured race (custom Joiner): winner returns, losers are cancelled
+### 7. Structured race (custom Joiner): bartender-N threads, one "Served", the others "Cancelled after N ms", then "Scope closed"
 GET http://localhost:8080/beverage/structured/race/custom
 
-### 8. Structured fail-fast: one failure cancels the siblings (50% flakey, run it a few times)
+### 8. Structured fail-fast: "Coffee machine broke!" cancels the bartenders still brewing (50% flakey, run it a few times)
 GET http://localhost:8080/beverage/structured/failfast

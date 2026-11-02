@@ -136,7 +136,9 @@ public class VirtualBeverageResource {
         var b1 = CompletableFuture.supplyAsync(bartender::race, executor);
         var b2 = CompletableFuture.supplyAsync(bartender::race, executor);
         var b3 = CompletableFuture.supplyAsync(bartender::race, executor);
-        return (VirtualBeverage) CompletableFuture.anyOf(b1, b2, b3).get();
+        var winner = (VirtualBeverage) CompletableFuture.anyOf(b1, b2, b3).get();
+        Log.info("Winner served, returning: the other bartenders are still brewing");
+        return winner;
     }
 
     @GET

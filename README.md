@@ -111,6 +111,7 @@ Structured Concurrency (JEP 533, 7th preview in JDK 27; final in JDK 28). Subtas
 - Lifetimes are explicit and safe: no orphaned threads
 - Cancellation propagates automatically to sibling tasks
 - Uses `StructuredTaskScope.open()` with different joiners
+- Forked threads are named `bartender-1..3`; cancelled subtasks log `Cancelled after N ms, stopped brewing` and the endpoint logs `Scope closed` once every subtask is done, so cancellation is visible in the dev console
 
 | Endpoint | Joiner | Description |
 |---|---|---|
@@ -118,7 +119,7 @@ Structured Concurrency (JEP 533, 7th preview in JDK 27; final in JDK 28). Subtas
 | `/beverage/structured/custom` | `allSuccessfulOrThrow()` | Same with a named thread factory |
 | `/beverage/structured/race` | `anySuccessfulOrThrow()` | 3 bartenders with random 1–3 s brews: first to finish wins, siblings cancelled |
 | `/beverage/structured/race/custom` | custom `FirstSuccessJoiner` | Same race with a hand-written Joiner — compare with `/beverage/virtual/race` |
-| `/beverage/structured/failfast` | `allSuccessfulOrThrow()` | One failure cancels everyone (uses a flakey bartender, 50% chance) |
+| `/beverage/structured/failfast` | `allSuccessfulOrThrow()` | One failure cancels the bartenders still brewing (flakey bartender, 50% chance, random 1–3 s brews) |
 | `/beverage/structured/timeout` | `allSuccessfulOrThrow()` + `withTimeout` | Scope cancelled after 150 ms, returns 504 |
 
 ---
