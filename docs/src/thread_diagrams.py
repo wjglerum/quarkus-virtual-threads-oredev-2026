@@ -8,11 +8,11 @@ FONT = "Carlito, Calibri, sans-serif"
 
 
 class D:
-    def __init__(self, w, h, units, label_w, x1, top):
+    def __init__(self, w, h, units, label_w, x1, top, lane_h=104, bar_h=62):
         self.w, self.h, self.units, self.lw, self.x1, self.top = w, h, units, label_w, x1, top
         self.x0 = label_w + 30
         self.ppu = (x1 - self.x0) / units
-        self.lane_h, self.bar_h = 104, 62
+        self.lane_h, self.bar_h = lane_h, bar_h
         self.out = []
         self.lanes = {}
 
@@ -104,10 +104,15 @@ class D:
                 s = f'<rect x="{cx}" y="{y + 6}" width="54" height="22" rx="6" fill="{col}" fill-opacity="0.18" stroke="{col}" stroke-width="2"/>'
             self.out.append(s)
             self.out.append(f'<text x="{cx + 66}" y="{y + 26}" font-size="25" fill="{SLATE}">{label}</text>')
+            step = 66 + len(label) * 12.2 + 50
             if gap == "rows":
                 y += 50
             else:
-                cx += 66 + len(label) * 12.2 + 50
+                cx += step
+                nxt = kinds[kinds.index(k) + 1] if kinds.index(k) + 1 < len(kinds) else None
+                if nxt and cx + 66 + len(items[nxt][0]) * 12.2 > self.x1:
+                    cx = self.x0 if x is None else x
+                    y += 50
 
     def svg(self):
         pats = "".join(
@@ -119,104 +124,100 @@ class D:
                 f'<defs>{pats}</defs><rect width="{self.w}" height="{self.h}" fill="#FFFFFF"/>\n{body}\n</svg>')
 
 
-def wide():
-    return D(2240, 1000, 16, 330, 2200, 40)
+def wide(h):
+    return D(1600, h, 16, 300, 1570, 20)
+
+
+AX = [(0, "0"), (8, "8"), (10, "10"), (16, "16")]
 
 
 def blocking():
-    d = wide()
+    d = wide(720)
     d.lane("A", "Platform thread A"); d.lane("B", "Platform thread B")
     d.lane("Q", "Request queue", "no thread free"); d.lane("R", "Remote service")
     d.bar("A", 0, 1, "run", C["R1"], "R1"); d.bar("A", 1, 7, "blocked", C["R1"], "R1 blocked")
     d.bar("A", 7, 8, "run", C["R1"], "R1")
     d.bar("B", 1, 2, "run", C["R2"], "R2"); d.bar("B", 2, 8, "blocked", C["R2"], "R2 blocked")
     d.bar("B", 8, 9, "run", C["R2"], "R2")
-    d.bar("Q", 2, 8, "wait", C["R3"], "R3 waits for a thread")
+    d.bar("Q", 2, 8, "wait", C["R3"], "R3 waits")
     d.bar("A", 8, 9, "run", C["R3"], "R3"); d.bar("A", 9, 15, "blocked", C["R3"], "R3 blocked")
     d.bar("A", 15, 16, "run", C["R3"], "R3")
-    d.bar("R", 1, 7, "slot0", C["R1"], "R1 brew"); d.bar("R", 2, 8, "slot1", C["R2"], "R2 brew"); d.bar("R", 9, 15, "slot2", C["R3"], "R3 brew")
-    d.done(8, "R1", "A"); d.done(9, "R2", "B"); d.done(16, "R3", "A")
-    d.axis(500, [(0, "0"), (8, "8"), (10, "10"), (16, "16")])
-    d.note(d.x0, 650, "Two threads, three requests: R3 has to wait until a thread is free, so the last coffee is ready at t = 16.", NAVY, 30, weight="700")
-    d.legend(710, ["run", "blocked", "wait", "call"])
-    d.h = 780
+    d.bar("R", 1, 7, "slot0", C["R1"], "R1 call"); d.bar("R", 2, 8, "slot1", C["R2"], "R2 call"); d.bar("R", 9, 15, "slot2", C["R3"], "R3 call")
+    d.done(8, "R1"); d.done(9, "R2"); d.done(16, "R3")
+    d.axis(470, AX)
+    d.note(d.x0, 580, "R3 waits for a free thread: last response at t = 16.", NAVY, 32, weight="700")
+    d.legend(620, ["run", "blocked", "wait", "call"])
     return d
 
 
 def nonblocking():
-    d = wide()
+    d = wide(520)
     d.lane("E", "Event loop", "one platform thread"); d.lane("R", "Remote service")
     for i, r in enumerate(["R1", "R2", "R3"]):
         d.bar("E", i, i + 1, "run", C[r], r)
         d.bar("E", i + 7, i + 8, "run", C[r], r)
-        d.bar("R", i + 1, i + 7, f"slot{i}", C[r], f"{r} brew")
-    d.done(8, "R1", "E"); d.done(9, "R2", "E"); d.done(10, "R3", "E")
-    d.note((d.x(3) + d.x(7)) / 2, d.lanes["E"] + 63, "free for other work", MUTED, 26, "middle", italic=True)
-    d.axis(300, [(0, "0"), (8, "8"), (10, "10"), (16, "16")])
-    d.note(d.x0, 450, "One thread never waits: it starts all three brews, then runs each callback when its reply arrives. Done at t = 10.", NAVY, 30, weight="700")
-    d.legend(510, ["run", "call"])
-    d.note(d.x0, 600, "The price: the code has to be written as non-blocking callbacks or pipelines.", MUTED, 24, italic=True)
-    d.h = 640
+        d.bar("R", i + 1, i + 7, f"slot{i}", C[r], f"{r} call")
+    d.done(8, "R1"); d.done(9, "R2"); d.done(10, "R3")
+    d.note((d.x(3) + d.x(7)) / 2, d.lanes["E"] + 62, "free", MUTED, 28, "middle", italic=True)
+    d.axis(262, AX)
+    d.note(d.x0, 372, "One thread never waits: all done at t = 10.", NAVY, 32, weight="700")
+    d.note(d.x0, 414, "The price: the code is written as non-blocking pipelines.", MUTED, 26, italic=True)
+    d.legend(450, ["run", "call"])
     return d
 
 
 def virtual():
-    d = wide()
+    d = wide(800)
     d.lane("C", "Carrier thread", "one platform thread")
     for i, r in enumerate(["R1", "R2", "R3"]):
         d.lane(r, f"Virtual thread {i + 1}")
     d.lane("R", "Remote service")
     for i, r in enumerate(["R1", "R2", "R3"]):
-        d.bar("R", i + 1, i + 7, f"slot{i}", C[r], f"{r} brew")
+        d.bar("R", i + 1, i + 7, f"slot{i}", C[r], f"{r} call")
         d.bar("C", i, i + 1, "run", C[r], r); d.bar("C", i + 7, i + 8, "run", C[r], r)
         d.bar(r, i, i + 1, "run", C[r], r)
-        d.bar(r, i + 1, i + 7, "parked", C[r], f"{r} parked during the brew")
+        d.bar(r, i + 1, i + 7, "parked", C[r], f"{r} parked")
         d.bar(r, i + 7, i + 8, "run", C[r], r)
-    d.done(8, "R1", "C"); d.done(9, "R2", "C"); d.done(10, "R3", "C")
-    d.note((d.x(3) + d.x(7)) / 2, d.lanes["C"] + 63, "free for other virtual threads", MUTED, 26, "middle", italic=True)
-    d.axis(604, [(0, "0"), (8, "8"), (10, "10"), (16, "16")])
-    d.note(d.x0, 750, "Same plain blocking code: each virtual thread parks while it waits and the carrier moves on. Done at t = 10.", NAVY, 30, weight="700")
-    d.legend(810, ["run", "parked", "call"])
-    d.note(d.x0, 900, "Same timeline as the event loop, without rewriting the code.", MUTED, 24, italic=True)
-    d.h = 940
+    d.done(8, "R1"); d.done(9, "R2"); d.done(10, "R3")
+    d.note((d.x(3) + d.x(7)) / 2, d.lanes["C"] + 62, "free", MUTED, 28, "middle", italic=True)
+    d.axis(574, AX)
+    d.note(d.x0, 684, "Plain blocking code, same timeline as the event loop: done at t = 10.", NAVY, 32, weight="700")
+    d.legend(724, ["run", "parked", "call"])
     return d
 
 
-def narrow(units):
-    return D(1350, 1000, units, 300, 1320, 30)
+def narrow(units, h):
+    return D(950, h, units, 250, 930, 10, lane_h=86, bar_h=54)
+
+
+AXN = [(0, "0"), (8, "8"), (10, "10")]
 
 
 def pinning():
-    d = narrow(10)
-    d.lane("C", "Carrier thread"); d.lane("V1", "Virtual thread 1", "inside synchronized"); d.lane("V2", "Virtual thread 2"); d.lane("R", "Remote service")
-    d.bar("C", 0, 1, "run", C["R1"], "R1"); d.bar("C", 1, 7, "blocked", RED, "carrier stuck")
-    d.bar("C", 7, 8, "run", C["R1"], "R1"); d.bar("C", 8, 9, "run", C["R2"], "R2")
-    d.bar("V1", 0, 1, "run", C["R1"], "R1"); d.bar("V1", 1, 7, "blocked", C["R1"], "pinned")
-    d.bar("V1", 7, 8, "run", C["R1"], "R1")
-    d.bar("V2", 1, 8, "wait", C["R2"], "can't mount"); d.bar("V2", 8, 9, "run", C["R2"], "R2")
+    d = narrow(10, 660)
+    d.lane("C", "Carrier"); d.lane("V1", "Virtual thread 1", "in synchronized"); d.lane("V2", "Virtual thread 2"); d.lane("R", "Remote service")
+    d.bar("C", 0, 1, "run", C["R1"], ""); d.bar("C", 1, 7, "blocked", RED, "stuck")
+    d.bar("C", 7, 8, "run", C["R1"], ""); d.bar("C", 8, 9, "run", C["R2"], "")
+    d.bar("V1", 0, 1, "run", C["R1"], ""); d.bar("V1", 1, 7, "blocked", C["R1"], "pinned")
+    d.bar("V1", 7, 8, "run", C["R1"], "")
+    d.bar("V2", 1, 8, "wait", C["R2"], "can't mount"); d.bar("V2", 8, 9, "run", C["R2"], "")
     d.bar("V2", 9, 10, "parked", C["R2"], "")
-    d.bar("R", 1, 7, "call", C["R1"], "R1 brew")
-    d.axis(500, [(0, "0"), (8, "8"), (10, "10")])
-    d.note(d.x0, 600, "VT1 blocks while pinned, so the carrier is", NAVY, 28, weight="700")
-    d.note(d.x0, 638, "held too and VT2 cannot run.", NAVY, 28, weight="700")
-    d.legend(680, ["run", "blocked", "wait", "parked"], gap="rows")
-    d.note(d.x0, 920, "JDK 21–23 with synchronized. JDK 24+ (JEP 491): no longer pins.", MUTED, 22, italic=True)
+    d.bar("R", 1, 7, "call", C["R1"], "R1 call")
+    d.axis(380, AXN)
+    d.legend(460, ["run", "blocked", "wait", "parked"], gap="rows")
     return d
 
 
 def cpu():
-    d = narrow(10)
+    d = narrow(10, 660)
     d.lane("C1", "Carrier 1"); d.lane("C2", "Carrier 2")
     d.lane("V1", "Virtual thread 1", "CPU-bound"); d.lane("V2", "Virtual thread 2", "CPU-bound"); d.lane("V3", "Virtual thread 3", "short I/O task")
-    d.bar("C1", 0, 9, "run", C["R1"], "VT1 computing"); d.bar("C2", 1, 10, "run", C["R2"], "VT2 computing")
+    d.bar("C1", 0, 9, "run", C["R1"], "VT1"); d.bar("C1", 9, 10, "run", C["R3"], "")
+    d.bar("C2", 1, 10, "run", C["R2"], "VT2")
     d.bar("V1", 0, 9, "run", C["R1"], "never yields"); d.bar("V2", 1, 10, "run", C["R2"], "never yields")
     d.bar("V3", 2, 9, "wait", C["R3"], "no carrier free"); d.bar("V3", 9, 10, "run", C["R3"], "")
-    d.bar("C1", 9, 10, "run", C["R3"], "")
-    d.axis(600, [(0, "0"), (9, "9"), (10, "10")])
-    d.note(d.x0, 700, "No blocking call means no yield point: each", NAVY, 28, weight="700")
-    d.note(d.x0, 738, "CPU-bound task keeps its carrier.", NAVY, 28, weight="700")
-    d.legend(780, ["run", "wait"], gap="rows")
-    d.note(d.x0, 920, "Offload CPU-heavy work to a separate pool.", MUTED, 24, italic=True)
+    d.axis(470, [(0, "0"), (9, "9"), (10, "10")])
+    d.legend(560, ["run", "wait"])
     return d
 
 

@@ -1,42 +1,39 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1350" height="1000" viewBox="0 0 1350 1000" font-family="Carlito, Calibri, sans-serif"><defs><pattern id="h065A82" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#065A82" fill-opacity="0.55"/></pattern><pattern id="h047857" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#047857" fill-opacity="0.55"/></pattern><pattern id="hB45309" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#B45309" fill-opacity="0.55"/></pattern><pattern id="hE11D48" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#E11D48" fill-opacity="0.55"/></pattern><pattern id="h64748B" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#64748B" fill-opacity="0.55"/></pattern></defs><rect width="1350" height="1000" fill="#FFFFFF"/>
-<rect x="320" y="36" width="1010" height="92" rx="10" fill="#F1F5F9"/>
-<text x="300" y="93.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Carrier 1</text>
-<rect x="320" y="140" width="1010" height="92" rx="10" fill="#F1F5F9"/>
-<text x="300" y="197.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Carrier 2</text>
-<rect x="320" y="244" width="1010" height="92" rx="10" fill="#F1F5F9"/>
-<text x="300" y="290.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Virtual thread 1</text>
-<text x="300" y="322.0" font-size="23" fill="#64748B" text-anchor="end">CPU-bound</text>
-<rect x="320" y="348" width="1010" height="92" rx="10" fill="#F1F5F9"/>
-<text x="300" y="394.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Virtual thread 2</text>
-<text x="300" y="426.0" font-size="23" fill="#64748B" text-anchor="end">CPU-bound</text>
-<rect x="320" y="452" width="1010" height="92" rx="10" fill="#F1F5F9"/>
-<text x="300" y="498.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Virtual thread 3</text>
-<text x="300" y="530.0" font-size="23" fill="#64748B" text-anchor="end">short I/O task</text>
-<rect x="332.0" y="51.0" width="887.0" height="62" rx="8" fill="#065A82"/>
-<text x="775.5" y="92.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">VT1 computing</text>
-<rect x="431.0" y="155.0" width="887.0" height="62" rx="8" fill="#047857"/>
-<text x="874.5" y="196.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">VT2 computing</text>
-<rect x="332.0" y="259.0" width="887.0" height="62" rx="8" fill="#065A82"/>
-<text x="775.5" y="300.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">never yields</text>
-<rect x="431.0" y="363.0" width="887.0" height="62" rx="8" fill="#047857"/>
-<text x="874.5" y="404.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">never yields</text>
-<rect x="530.0" y="467.0" width="689.0" height="62" rx="8" fill="#FFFFFF" stroke="#64748B" stroke-width="3" stroke-dasharray="4 6"/>
-<text x="874.5" y="508.0" font-size="26" font-weight="700" fill="#64748B" text-anchor="middle">no carrier free</text>
-<rect x="1223.0" y="467.0" width="95.0" height="62" rx="8" fill="#B45309"/>
-<rect x="1223.0" y="51.0" width="95.0" height="62" rx="8" fill="#B45309"/>
-<line x1="330" y1="600" x2="1320" y2="600" stroke="#CBD5E1" stroke-width="3"/>
-<line x1="330.0" y1="592" x2="330.0" y2="608" stroke="#64748B" stroke-width="3"/>
-<text x="330.0" y="638" font-size="24" fill="#64748B" text-anchor="middle">0</text>
-<line x1="1221.0" y1="592" x2="1221.0" y2="608" stroke="#64748B" stroke-width="3"/>
-<text x="1221.0" y="638" font-size="24" fill="#64748B" text-anchor="middle">9</text>
-<line x1="1320.0" y1="592" x2="1320.0" y2="608" stroke="#64748B" stroke-width="3"/>
-<text x="1320.0" y="638" font-size="24" fill="#64748B" text-anchor="middle">10</text>
-<text x="1320" y="584" font-size="24" fill="#64748B" text-anchor="end">time →</text>
-<text x="330" y="700" font-size="28" font-weight="700" fill="#21295C" text-anchor="start">No blocking call means no yield point: each</text>
-<text x="330" y="738" font-size="28" font-weight="700" fill="#21295C" text-anchor="start">CPU-bound task keeps its carrier.</text>
-<rect x="330" y="780" width="54" height="34" rx="6" fill="#065A82"/>
-<text x="396" y="806" font-size="25" fill="#334155">running on a CPU</text>
-<rect x="330" y="830" width="54" height="34" rx="6" fill="#FFF" stroke="#64748B" stroke-width="3" stroke-dasharray="4 5"/>
-<text x="396" y="856" font-size="25" fill="#334155">waiting for a free thread</text>
-<text x="330" y="920" font-size="24" font-weight="400" fill="#64748B" text-anchor="start" font-style="italic">Offload CPU-heavy work to a separate pool.</text>
+<svg xmlns="http://www.w3.org/2000/svg" width="950" height="660" viewBox="0 0 950 660" font-family="Carlito, Calibri, sans-serif"><defs><pattern id="h065A82" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#065A82" fill-opacity="0.55"/></pattern><pattern id="h047857" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#047857" fill-opacity="0.55"/></pattern><pattern id="hB45309" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#B45309" fill-opacity="0.55"/></pattern><pattern id="hE11D48" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#E11D48" fill-opacity="0.55"/></pattern><pattern id="h64748B" width="16" height="16" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="16" height="16" fill="#FFFFFF"/><rect width="6" height="16" fill="#64748B" fill-opacity="0.55"/></pattern></defs><rect width="950" height="660" fill="#FFFFFF"/>
+<rect x="270" y="16" width="670" height="74" rx="10" fill="#F1F5F9"/>
+<text x="250" y="64.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Carrier 1</text>
+<rect x="270" y="102" width="670" height="74" rx="10" fill="#F1F5F9"/>
+<text x="250" y="150.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Carrier 2</text>
+<rect x="270" y="188" width="670" height="74" rx="10" fill="#F1F5F9"/>
+<text x="250" y="225.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Virtual thread 1</text>
+<text x="250" y="257.0" font-size="23" fill="#64748B" text-anchor="end">CPU-bound</text>
+<rect x="270" y="274" width="670" height="74" rx="10" fill="#F1F5F9"/>
+<text x="250" y="311.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Virtual thread 2</text>
+<text x="250" y="343.0" font-size="23" fill="#64748B" text-anchor="end">CPU-bound</text>
+<rect x="270" y="360" width="670" height="74" rx="10" fill="#F1F5F9"/>
+<text x="250" y="397.0" font-size="30" font-weight="700" fill="#21295C" text-anchor="end">Virtual thread 3</text>
+<text x="250" y="429.0" font-size="23" fill="#64748B" text-anchor="end">short I/O task</text>
+<rect x="282.0" y="26.0" width="581.0" height="54" rx="8" fill="#065A82"/>
+<text x="572.5" y="63.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">VT1</text>
+<rect x="867.0" y="26.0" width="61.0" height="54" rx="8" fill="#B45309"/>
+<rect x="347.0" y="112.0" width="581.0" height="54" rx="8" fill="#047857"/>
+<text x="637.5" y="149.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">VT2</text>
+<rect x="282.0" y="198.0" width="581.0" height="54" rx="8" fill="#065A82"/>
+<text x="572.5" y="235.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">never yields</text>
+<rect x="347.0" y="284.0" width="581.0" height="54" rx="8" fill="#047857"/>
+<text x="637.5" y="321.0" font-size="26" font-weight="700" fill="#FFFFFF" text-anchor="middle">never yields</text>
+<rect x="412.0" y="370.0" width="451.0" height="54" rx="8" fill="#FFFFFF" stroke="#64748B" stroke-width="3" stroke-dasharray="4 6"/>
+<text x="637.5" y="407.0" font-size="26" font-weight="700" fill="#64748B" text-anchor="middle">no carrier free</text>
+<rect x="867.0" y="370.0" width="61.0" height="54" rx="8" fill="#B45309"/>
+<line x1="280" y1="470" x2="930" y2="470" stroke="#CBD5E1" stroke-width="3"/>
+<line x1="280.0" y1="462" x2="280.0" y2="478" stroke="#64748B" stroke-width="3"/>
+<text x="280.0" y="508" font-size="24" fill="#64748B" text-anchor="middle">0</text>
+<line x1="865.0" y1="462" x2="865.0" y2="478" stroke="#64748B" stroke-width="3"/>
+<text x="865.0" y="508" font-size="24" fill="#64748B" text-anchor="middle">9</text>
+<line x1="930.0" y1="462" x2="930.0" y2="478" stroke="#64748B" stroke-width="3"/>
+<text x="930.0" y="508" font-size="24" fill="#64748B" text-anchor="middle">10</text>
+<text x="930" y="454" font-size="24" fill="#64748B" text-anchor="end">time →</text>
+<rect x="280" y="560" width="54" height="34" rx="6" fill="#065A82"/>
+<text x="346" y="586" font-size="25" fill="#334155">running on a CPU</text>
+<rect x="280" y="610" width="54" height="34" rx="6" fill="#FFF" stroke="#64748B" stroke-width="3" stroke-dasharray="4 5"/>
+<text x="346" y="636" font-size="25" fill="#334155">waiting for a free thread</text>
 </svg>
