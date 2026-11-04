@@ -55,6 +55,11 @@ The traditional Java model. Each request runs on a platform (OS) thread from the
 | `/beverage/blocking` | Single request |
 | `/beverage/blocking/sequential` | 3 requests, one after another |
 | `/beverage/blocking/parallel` | 3 requests via `ManagedExecutor` |
+
+Flood, race and fail-fast demos live in `BlockingShowdownResource` under the same URLs, so the basic resource stays focused:
+
+| Endpoint | Description |
+|---|---|
 | `/beverage/blocking/flood?count=100` | Fans out 100 tasks on a fixed pool of 50 threads + 25 queued — shows saturation |
 | `/beverage/blocking/failfast` | 3 parallel flakey calls — first failure returns 503, siblings keep running |
 
@@ -75,6 +80,11 @@ The reactive model. Requests run on the Vert.x event loop; the thread is **never
 | `/beverage/reactive` | Single request |
 | `/beverage/reactive/sequential` | 3 chained `Uni` calls |
 | `/beverage/reactive/parallel` | 3 parallel `Uni` calls via `Uni.join()` |
+
+Flood, race and fail-fast demos live in `ReactiveShowdownResource` under the same URLs, so the basic resource stays focused:
+
+| Endpoint | Description |
+|---|---|
 | `/beverage/reactive/flood?count=100` | Fans out 100 non-blocking calls |
 | `/beverage/reactive/failfast` | 3 parallel flakey calls via `Uni.join().andFailFast()` — first failure cancels the join |
 
@@ -96,6 +106,11 @@ Virtual threads (JEP 444). Each request runs on a **virtual thread** — cheap, 
 | `/beverage/virtual/sequential` | 3 sequential calls |
 | `/beverage/virtual/parallel` | 3 parallel calls via injected `@VirtualThreads` executor |
 | `/beverage/virtual/custom` | 3 parallel calls with a named custom thread factory |
+
+Flood, race and fail-fast demos live in `VirtualShowdownResource` under the same URLs, so the basic resource stays focused:
+
+| Endpoint | Description |
+|---|---|
 | `/beverage/virtual/flood?count=100` | Fans out 100 tasks on virtual threads — all succeed |
 | `/beverage/virtual/race` | 3 bartenders raced with `CompletableFuture.anyOf` — the losers keep brewing |
 | `/beverage/virtual/failfast` | 3 parallel flakey calls — first failure returns 503, siblings keep running |
