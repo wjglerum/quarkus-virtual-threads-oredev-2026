@@ -4,7 +4,7 @@ Checklist for running the four live demos on stage. The requests are in [`demo.h
 
 ## Running order
 
-The 41 slides that are shown, with the demos in place. Slide numbers are the deck's own numbers, so they skip the hidden slides. Slides marked *brief* are there for context: give each one a sentence or two and move on.
+The 40 slides that are shown, with the demos in place. Slide numbers are the deck's own numbers, so they skip the hidden slides. Slides marked *brief* are there for context: give each one a sentence or two and move on.
 
 | Slide | Title | Demo |
 |---|---|---|
@@ -24,7 +24,7 @@ The 41 slides that are shown, with the demos in place. Slide numbers are the dec
 | 45 | Demo: Imperative on virtual threads | **3** · requests 5–6 |
 | 51, 52 | **05 Structured Concurrency:** Why structured concurrency | |
 | 54 | Demo: First success, cancel the rest | **4** · request 7 |
-| 65–67 | **06 Comparison & Conclusions:** Where Quarkus sits, Spring: virtual threads in MVC | |
+| 65, 66 | **06 Comparison & Conclusions:** Where Quarkus sits | |
 | 68, 69 | Comparison, A decision framework | |
 | 70, 71 | References, Thank you (questions) | |
 
