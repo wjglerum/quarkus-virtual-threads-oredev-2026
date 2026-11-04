@@ -1,26 +1,23 @@
 # On-stage demo script, in talk order. Full list of endpoints: examples.http
-# Keep Grafana open on the "Concurrency Crossroads" dashboard during the floods.
+# The flood results are JSON: read out "succeeded", "failed" and "durationMs".
 
-### 1. Blocking: one coffee (~3 s)
+### 1. Blocking: one coffee (~3 s) on an executor-thread that waits the whole time
 GET http://localhost:8080/beverage/blocking
 
-### 2. Blocking flood: 50 threads + 25 queued, so ~75 succeed, ~25 rejected, ~6 s
+### 2. Blocking flood: 50 threads + 25 queued, so 75 succeed, 25 fail, ~6 s
 GET http://localhost:8080/beverage/blocking/flood?count=100
 
 ### 3. Reactive sequential: show the nested flatMap chain (~9 s)
 GET http://localhost:8080/beverage/reactive/sequential
 
-### 4. Reactive flood: all 100 succeed in ~3 s on a handful of event-loop threads
-GET http://localhost:8080/beverage/reactive/flood?count=100
+### 4. Reactive parallel: Uni.join(), three coffees in ~3 s on the event loop
+GET http://localhost:8080/beverage/reactive/parallel
 
-### 5. Virtual flood: same imperative code as blocking, all 100 succeed in ~3 s
+### 5. Virtual parallel: same code as blocking, three coffees in ~3 s on virtual threads
+GET http://localhost:8080/beverage/virtual/parallel
+
+### 6. Virtual flood: one virtual thread per task, all 100 succeed in ~3 s
 GET http://localhost:8080/beverage/virtual/flood?count=100
-
-### 6. Virtual race (CompletableFuture.anyOf): the log shows "Winner served, returning" and then the losers still "Served ... after N ms"
-GET http://localhost:8080/beverage/virtual/race
 
 ### 7. Structured race (custom Joiner): bartender-N threads, one "Served", the others "Cancelled after N ms", then "Scope closed"
 GET http://localhost:8080/beverage/structured/race/custom
-
-### 8. Structured fail-fast: "Coffee machine broke!" cancels the bartenders still brewing (50% flakey, run it a few times)
-GET http://localhost:8080/beverage/structured/failfast
