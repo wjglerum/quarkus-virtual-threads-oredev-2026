@@ -2,6 +2,29 @@
 
 Checklist for running the four live demos on stage. The requests are in [`demo.http`](demo.http), in talk order.
 
+## Running order
+
+The 35 slides that are shown, with the demos in place. Slide numbers are the deck's own numbers, so they skip the hidden slides.
+
+| Slide | Title | Demo |
+|---|---|---|
+| 1–4 | Title, What you get today, whoami, Agenda | |
+| 5–7 | **01 Introduction:** A short history of Java concurrency, Three threading models | |
+| 8–11 | **02 Blocking I/O:** I/O is everywhere, Platform threads, Blocking I/O | |
+| 12 | Demo App: The Quarkus Coffee Shop | |
+| 13 | Demo: Blocking I/O | **1** · request 2 |
+| 14, 17, 18 | **03 Reactive Programming:** Reactive programming in one slide, Non-blocking I/O | |
+| 26 | Demo: The reactive coffee shop | **2** · request 4 |
+| 27 | Reactive gotchas | |
+| 29, 30, 32, 33 | **04 Virtual Threads:** Virtual threads, Mount and unmount, Virtual threads (one carrier, three virtual threads) | |
+| 37, 38 | What virtual threads give you, Pinning: the synchronized story | |
+| 45 | Demo: Imperative on virtual threads | **3** · request 5 |
+| 51, 52 | **05 Structured Concurrency:** Why structured concurrency | |
+| 54 | Demo: First success, cancel the rest | **4** · requests 6–8 |
+| 65–67 | **06 Comparison & Conclusions:** Where Quarkus sits, Spring: the shift nobody predicted | |
+| 68, 69 | Comparison, A decision framework | |
+| 70, 71 | References, Thank you (questions) | |
+
 ## The evening before (on good Wi-Fi)
 
 1. `sdk env` → should select `27.0.0.0+35-tem`; check with `java -version`.
