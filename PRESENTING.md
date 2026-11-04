@@ -4,7 +4,7 @@ Checklist for running the four live demos on stage. The requests are in [`demo.h
 
 ## Running order
 
-The 35 slides that are shown, with the demos in place. Slide numbers are the deck's own numbers, so they skip the hidden slides.
+The 40 slides that are shown, with the demos in place. Slide numbers are the deck's own numbers, so they skip the hidden slides. Slides marked *brief* are there for context: give each one a sentence or two and move on.
 
 | Slide | Title | Demo |
 |---|---|---|
@@ -13,15 +13,18 @@ The 35 slides that are shown, with the demos in place. Slide numbers are the dec
 | 8–11 | **02 Blocking I/O:** I/O is everywhere, Platform threads, Blocking I/O | |
 | 12 | Demo App: The Quarkus Coffee Shop | |
 | 13 | Demo: Blocking I/O | **1** · requests 1–2 |
-| 14, 17, 18 | **03 Reactive Programming:** Reactive programming in one slide, Non-blocking I/O | |
+| 14, 15 | **03 Reactive Programming:** Reactive systems *(brief)* | |
+| 17, 18 | Reactive programming, Non-blocking I/O | |
+| 20, 22, 23, 25 | Unification: Imperative and Reactive, Your options in Quarkus, Mutiny: Uni & Multi, Quarkus reactive extensions *(all brief)* | |
 | 26 | Demo: The reactive coffee shop | **2** · requests 3–4 |
 | 27 | Reactive gotchas | |
+| 28 | Real examples from production *(brief, no live request)* | |
 | 29, 30, 32, 33 | **04 Virtual Threads:** Virtual threads, Mount and unmount, Virtual threads (one carrier, three virtual threads) | |
 | 37, 38 | What virtual threads give you, Pinning: the synchronized story | |
 | 45 | Demo: Imperative on virtual threads | **3** · requests 5–6 |
 | 51, 52 | **05 Structured Concurrency:** Why structured concurrency | |
 | 54 | Demo: First success, cancel the rest | **4** · request 7 |
-| 65–67 | **06 Comparison & Conclusions:** Where Quarkus sits, Spring: the shift nobody predicted | |
+| 65, 66 | **06 Comparison & Conclusions:** Where Quarkus sits | |
 | 68, 69 | Comparison, A decision framework | |
 | 70, 71 | References, Thank you (questions) | |
 
