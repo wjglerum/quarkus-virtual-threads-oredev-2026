@@ -32,7 +32,7 @@ All external dependencies (PostgreSQL, WireMock, Grafana/LGTM) are started autom
 - Dev UI: <http://localhost:8080/q/dev/>
 - Grafana (LGTM): check the Dev UI for the port
 
-Use `examples.http` with your IDE HTTP client (IntelliJ, VS Code REST Client) to fire requests. `demo.http` holds only the requests used on stage, in talk order.
+Use `examples.http` with your IDE HTTP client (IntelliJ, VS Code REST Client) to fire requests. `demo.http` holds only the requests used on stage, in talk order; [`PRESENTING.md`](PRESENTING.md) has the pre-talk checklist and fallbacks.
 
 ---
 
